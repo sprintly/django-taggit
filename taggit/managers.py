@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from taggit.forms import TagField
 from taggit.models import TaggedItem, GenericTaggedItemBase
 from taggit.utils import require_instance_manager
+from taggit.signals import tags_add, tags_remove
 
 
 try:
@@ -173,6 +174,8 @@ class _TaggableManager(models.Manager):
         for tag in tag_objs:
             self.through.objects.get_or_create(tag=tag, **self._lookup_kwargs())
 
+        tags_add.send(sender=self, instance=self.instance, tags=tag_objs)
+
     @require_instance_manager
     def set(self, *tags):
         self.clear()
@@ -182,6 +185,7 @@ class _TaggableManager(models.Manager):
     def remove(self, *tags):
         self.through.objects.filter(**self._lookup_kwargs()).filter(
             tag__name__in=tags).delete()
+        tags_remove.send(sender=self, instance=self.instance, tags=tags)
 
     @require_instance_manager
     def clear(self):
