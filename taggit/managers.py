@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from taggit.forms import TagField
 from taggit.models import TaggedItem, GenericTaggedItemBase
 from taggit.utils import require_instance_manager
-from taggit.signals import tags_add, tags_remove
+from taggit.signals import tags_add, tags_remove, tags_clear
 
 
 try:
@@ -190,6 +190,7 @@ class _TaggableManager(models.Manager):
     @require_instance_manager
     def clear(self):
         self.through.objects.filter(**self._lookup_kwargs()).delete()
+        tags_clear.send(sender=self, instance=self.instance)
 
     def most_common(self):
         return self.get_query_set().annotate(
