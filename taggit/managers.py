@@ -174,7 +174,7 @@ class _TaggableManager(models.Manager):
         for tag in tag_objs:
             self.through.objects.get_or_create(tag=tag, **self._lookup_kwargs())
 
-        tags_add.send(sender=self, instance=self.instance, tags=tag_objs)
+        tags_add.send(sender=self.instance.__class__, instance=self.instance, tags=tag_objs)
 
     @require_instance_manager
     def set(self, *tags):
@@ -185,12 +185,12 @@ class _TaggableManager(models.Manager):
     def remove(self, *tags):
         self.through.objects.filter(**self._lookup_kwargs()).filter(
             tag__name__in=tags).delete()
-        tags_remove.send(sender=self, instance=self.instance, tags=tags)
+        tags_remove.send(sender=self.instance.__class__, instance=self.instance, tags=tags)
 
     @require_instance_manager
     def clear(self):
         self.through.objects.filter(**self._lookup_kwargs()).delete()
-        tags_clear.send(sender=self, instance=self.instance)
+        tags_clear.send(sender=self.instance.__class__, instance=self.instance)
 
     def most_common(self):
         return self.get_query_set().annotate(
