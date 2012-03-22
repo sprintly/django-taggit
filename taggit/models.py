@@ -127,6 +127,7 @@ class GenericTaggedItemBase(ItemBase):
             related_name="%(app_label)s_%(class)s_tagged_items"
         )
     content_object = GenericForeignKey()
+    display_name = models.CharField(max_length=100)
 
     class Meta:
         abstract=True

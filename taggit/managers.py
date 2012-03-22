@@ -38,7 +38,9 @@ class TaggableRel(ManyToManyRel):
 
 class TaggableManager(RelatedField):
     def __init__(self, verbose_name=_("Tags"),
-        help_text=_("A comma-separated list of tags."), through=None, blank=False):
+        help_text=_("A comma-separated list of tags."),
+        through=None, blank=False):
+
         self.through = through or TaggedItem
         self.rel = TaggableRel()
         self.verbose_name = verbose_name
@@ -174,7 +176,8 @@ class _TaggableManager(models.Manager):
         for tag in tag_objs:
             self.through.objects.get_or_create(tag=tag, **self._lookup_kwargs())
 
-        tags_add.send(sender=self.instance.__class__, instance=self.instance, tags=tag_objs)
+        tags_add.send(sender=self.instance.__class__, instance=self.instance,
+            tags=tag_objs)
 
     @require_instance_manager
     def set(self, *tags):
@@ -185,7 +188,8 @@ class _TaggableManager(models.Manager):
     def remove(self, *tags):
         self.through.objects.filter(**self._lookup_kwargs()).filter(
             tag__name__in=tags).delete()
-        tags_remove.send(sender=self.instance.__class__, instance=self.instance, tags=tags)
+        tags_remove.send(sender=self.instance.__class__,
+            instance=self.instance, tags=tags)
 
     @require_instance_manager
     def clear(self):
