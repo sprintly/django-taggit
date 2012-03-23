@@ -156,6 +156,13 @@ class _TaggableManager(models.Manager):
         return self.through.lookup_kwargs(self.instance)
 
     @require_instance_manager
+    def all(self):
+        tags = {}
+        for t in super(_TaggableManager, self).all():
+            tags[t.unique_hash] = t
+        return tags.values()    
+
+    @require_instance_manager
     def add(self, *tags):
         str_tags = set([
             t
