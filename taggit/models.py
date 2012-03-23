@@ -5,6 +5,7 @@ from django.db import models, IntegrityError, transaction
 from django.template.defaultfilters import slugify as default_slugify
 from django.utils.translation import ugettext_lazy as _, ugettext
 import hashlib
+from datetime import datetime
 
 
 class TagBase(models.Model):
@@ -127,7 +128,6 @@ class GenericTaggedItemBase(ItemBase):
             related_name="%(app_label)s_%(class)s_tagged_items"
         )
     content_object = GenericForeignKey()
-    display_name = models.CharField(max_length=100)
 
     class Meta:
         abstract=True
