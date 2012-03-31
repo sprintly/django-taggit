@@ -159,8 +159,9 @@ class _TaggableManager(models.Manager):
     def all(self):
         tags = {}
         for t in super(_TaggableManager, self).all():
+            t.name = t.name.lower()
             tags[t.unique_hash] = t
-        return tags.values()    
+        return tags.values()
 
     @require_instance_manager
     def add(self, *tags):
