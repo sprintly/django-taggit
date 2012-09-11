@@ -173,9 +173,16 @@ class _TaggableManager(models.Manager):
         tag_objs = set(tags) - str_tags
         # If str_tags has 0 elements Django actually optimizes that to not do a
         # query.  Malcolm is very smart.
-        existing = self.through.tag_model().objects.filter(
-            name__in=str_tags
-        )
+        if len(tag_objs) > 0:
+            # Assuming tags are [foo, bar]: do an insensitive regexp search for
+            # (^foo$|^bar$). This is necessary b/c mysql will match accents on
+            # characters with IN syntax. ie: vidéo == video
+            existing = self.through.tag_model().objects.filter(
+                name__iregex = r'(%s)' % '|'.join(
+                    ['^%s$' % x for x in str_tags])
+                )
+        else:
+            existing = {}
         tag_objs.update(existing)
 
         for new_tag in str_tags - set(t.name for t in existing):
