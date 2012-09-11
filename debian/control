@@ -8,5 +8,5 @@ Homepage: https://github.com/sprintly/django-taggit
 
 Package: python-django-taggit
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, python (>= 2.5), python-django (>= 1.2.0)
+Depends: ${shlibs:Depends}, ${misc:Depends}, python (>= 2.5)
 Description: Simple tagging for Django.
