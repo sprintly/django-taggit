@@ -176,7 +176,7 @@ class _TaggableManager(models.Manager):
         if len(tag_objs) > 0:
             # Assuming tags are [foo, bar]: do an insensitive regexp search for
             # (^foo$|^bar$). This is necessary b/c mysql will match accents on
-            # characters with IN syntax. ie: vidéo == video
+            # characters with IN syntax. 
             existing = self.through.tag_model().objects.filter(
                 name__iregex = r'(%s)' % '|'.join(
                     ['^%s$' % x for x in str_tags])
