@@ -20,10 +20,17 @@ class TagBase(models.Model):
         abstract = True
 
     def _get_highest_slug_number(self, slug):
-        "When there are multiple slugs, instead of incrementing by one each
+        """When there are multiple slugs, instead of incrementing by one each
         time, find the highest, then add one to that. This should save
-        considerable time if you have lots of runs in your data."
-        return int(sorted([x[0] for x in self.__class__.objects.filter(slug__startswith='%s_' % slug).values_list('slug')], key=lambda x: int(x.split('_')[1]), reverse=True)[0].split('_')[1])
+        considerable time if you have lots of runs in your data."""
+        # Not using the ORM sorting b/c we need to do a numerical sort after
+        # string splitting.
+        max_slug = sorted(
+            self.__class__.objects.filter(
+                slug__startswith='%s_' % slug).values_list('slug', flat=True),
+            key=lambda x: int(x.split('_')[1]),
+            reverse=True)[0]
+        return int(max_tag.split('_')[1])
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.slug:
