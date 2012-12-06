@@ -30,7 +30,7 @@ class TagBase(models.Model):
                 slug__startswith='%s_' % slug).values_list('slug', flat=True),
             key=lambda x: int(x.split('_')[1]),
             reverse=True)[0]
-        return int(max_tag.split('_')[1])
+        return int(max_slug.split('_')[1])
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.slug:
