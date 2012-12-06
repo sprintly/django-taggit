@@ -49,7 +49,7 @@ class TagBase(models.Model):
                 trans_kwargs = {}
             i = 0
             while True:
-                self.slug = self.slugify(self.name, self._get_highest_slug(self.slug) + 1)
+                self.slug = self.slugify(self.name, self._get_highest_slug_number(self.slug) + 1)
                 try:
                     sid = transaction.savepoint(**trans_kwargs)
                     res = super(TagBase, self).save(*args, **kwargs)
