@@ -19,18 +19,21 @@ class TagBase(models.Model):
     class Meta:
         abstract = True
 
-    def _get_highest_slug_number(self, slug):
+    def _get_next_slug_number(self, slug):
         """When there are multiple slugs, instead of incrementing by one each
         time, find the highest, then add one to that. This should save
         considerable time if you have lots of runs in your data."""
         # Not using the ORM sorting b/c we need to do a numerical sort after
         # string splitting.
-        max_slug = sorted(
-            self.__class__.objects.filter(
-                slug__startswith='%s_' % slug).values_list('slug', flat=True),
-            key=lambda x: int(x.split('_')[1]),
-            reverse=True)[0]
-        return int(max_slug.split('_')[1])
+        try:
+            max_slug = sorted(
+                self.__class__.objects.filter(
+                    slug__startswith='%s_' % slug).values_list('slug', flat=True),
+                key=lambda x: int(x.split('_')[1]),
+                reverse=True)[0]
+            return int(max_slug.split('_')[1]) + 1
+        except IndexError:
+            return None
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.slug:
@@ -47,9 +50,8 @@ class TagBase(models.Model):
                 trans_kwargs = {"using": using}
             else:
                 trans_kwargs = {}
-            i = 0
             while True:
-                self.slug = self.slugify(self.name, self._get_highest_slug_number(self.slug) + 1)
+                self.slug = self.slugify(self.name, i=self._get_next_slug_number(self.slug))
                 try:
                     sid = transaction.savepoint(**trans_kwargs)
                     res = super(TagBase, self).save(*args, **kwargs)
