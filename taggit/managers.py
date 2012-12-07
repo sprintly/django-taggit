@@ -174,7 +174,7 @@ class _TaggableManager(models.Manager):
         tag_objs = set(tags) - str_tags
         # If str_tags has 0 elements Django actually optimizes that to not do a
         # query.  Malcolm is very smart.
-        if len(tag_objs) > 0:
+        if len(str_tags) > 0:
             # Assuming tags are [foo, bar]: do an insensitive regexp search for
             # (^foo$|^bar$). This is necessary b/c mysql will match accents on
             # characters with IN syntax. ie: vidéo == video
