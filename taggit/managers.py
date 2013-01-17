@@ -12,6 +12,8 @@ from taggit.models import TaggedItem, GenericTaggedItemBase
 from taggit.utils import require_instance_manager
 from taggit.signals import tags_add, tags_remove, tags_clear
 
+import re
+
 
 try:
     all
@@ -180,7 +182,7 @@ class _TaggableManager(models.Manager):
             # characters with IN syntax. ie: vidéo == video
             existing = self.through.tag_model().objects.filter(
                 name__iregex = r'(%s)' % '|'.join(
-                    ['^%s$' % x for x in str_tags])
+                    ['^%s$' % re.escape(x) for x in str_tags])
                 )
         else:
             existing = {}
