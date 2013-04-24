@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -10,6 +11,8 @@ from taggit.forms import TagField
 from taggit.models import TaggedItem, GenericTaggedItemBase
 from taggit.utils import require_instance_manager
 from taggit.signals import tags_add, tags_remove, tags_clear
+
+import re
 
 
 try:
@@ -174,9 +177,16 @@ class _TaggableManager(models.Manager):
         tag_objs = set(tags) - str_tags
         # If str_tags has 0 elements Django actually optimizes that to not do a
         # query.  Malcolm is very smart.
-        existing = self.through.tag_model().objects.filter(
-            name__in=str_tags
-        )
+        if len(str_tags) > 0:
+            # Assuming tags are [foo, bar]: do an insensitive regexp search for
+            # (^foo$|^bar$). This is necessary b/c mysql will match accents on
+            # characters with IN syntax. ie: vidéo == video
+            existing = self.through.tag_model().objects.filter(
+                name__iregex = r'(%s)' % '|'.join(
+                    ['^%s$' % re.escape(x) for x in str_tags])
+                )
+        else:
+            existing = {}
         tag_objs.update(existing)
 
         for new_tag in str_tags - set(t.name for t in existing):

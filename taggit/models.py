@@ -4,8 +4,8 @@ from django.contrib.contenttypes.generic import GenericForeignKey
 from django.db import models, IntegrityError, transaction
 from django.template.defaultfilters import slugify as default_slugify
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.encoding import smart_str
 import hashlib
-from datetime import datetime
 
 
 class TagBase(models.Model):
@@ -21,7 +21,7 @@ class TagBase(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.slug:
-            self.unique_hash = hashlib.sha1(self.name.upper()).hexdigest()
+            self.unique_hash = hashlib.sha1(smart_str(self.name).upper()).hexdigest()
             self.slug = self.slugify(self.name)
             if django.VERSION >= (1, 2):
                 from django.db import router
